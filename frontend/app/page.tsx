@@ -143,7 +143,7 @@ export default function Home() {
       <section className="py-20 md:py-32 flex items-center justify-center">
         <div className="container">
           <div className="text-center mb-12 flex flex-col justify-center items-center">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-mono font-bold tracking-tight text-foreground mb-4 md:mb-6 text-balance max-w-3xl">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-mono font-bold tracking-tight text-foreground mb-4 md:mb-6 text-balance max-w-3xl">
               Smart Frame Extraction for YouTube
             </h1>
             <p className="text-base md:text-xl text-muted-foreground max-w-lg mx-auto">
