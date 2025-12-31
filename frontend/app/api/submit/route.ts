@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     // Open access: allow higher quality and larger extraction for everyone
     const isPro = true;
-    const limit = 50;
+    const limit = 100;
     const requestedQuality = parseInt(quality) || 480;
 
     const jobId = Date.now().toString();
