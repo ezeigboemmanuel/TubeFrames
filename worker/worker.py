@@ -9,9 +9,9 @@ from datetime import timedelta
 from concurrent.futures import ThreadPoolExecutor
 from google.oauth2 import service_account
 
+# Setup
 r = redis.Redis.from_url(os.getenv('REDIS_URL', 'redis://redis:6379'))
 bucket_name = os.getenv("GCS_BUCKET_NAME")
-# Load the key from the environment variable we just set in Railway
 key_dict = json.loads(os.environ["GCP_CREDENTIALS"])
 credentials = service_account.Credentials.from_service_account_info(key_dict)
 storage_client = storage.Client(credentials=credentials, project=credentials.project_id)
@@ -20,7 +20,7 @@ bucket = storage_client.bucket(bucket_name)
 FRAMES_DIR = "/app/frames"
 os.makedirs(FRAMES_DIR, exist_ok=True)
 
-print("🚀 Worker Ready: Hybrid Mode (H.264 Preference + Smart Filters).")
+print("🚀 Worker Ready: Strict Scene Detection Mode (All Resolutions).")
 
 def upload_single_frame(args):
     file_path, job_id, index = args
@@ -47,11 +47,10 @@ while True:
     r.expire(f"job:{job_id}", 3600)
 
     try:
-        # 1. FORCE H.264 (AVC1)
-        # This tells yt-dlp: "Give me H.264 video if possible". 
-        # It is much faster to decode than AV1.
+        # 1. DOWNLOAD STREAM (Optimized for H.264)
+        # We still prefer H.264 (avc1) because decoding it for analysis is 
+        # lighter on the CPU than VP9 or AV1.
         v_limit = f"[height<={target_height}]"
-        # Preference: H.264 > VP9 > AV1
         format_selector = f"bestvideo{v_limit}[vcodec^=avc]+bestaudio/best{v_limit}/best"
 
         yt_cmd = [
@@ -63,30 +62,16 @@ while True:
             "-f", format_selector
         ]
 
-        ffmpeg_input_args = []
-        ffmpeg_filter_args = []
+        # 2. STRICT SCENE DETECTION (Applied to ALL resolutions)
+        print(f"🎨 Analyzing Frames for Scene Changes (Threshold: 0.4)...")
 
-        # 2. HYBRID LOGIC
-        if target_height >= 720:
-             # HD MODE (720p / 1080p / 4K)
-             # Use Keyframes for speed, but filter duplicates aggressively
-             print(f"⚡ HD Mode ({target_height}p): Keyframes + Strict De-Duplication...")
-             
-             ffmpeg_input_args = ["-skip_frame", "nokey", "-i", "pipe:0"]
-             
-             # mpdecimate: Removes frames that look similar to the previous one
-             # hi/lo/frac: tuned to drop frames that are "mostly the same"
-             ffmpeg_filter_args = ["-vsync", "0", "-vf", "mpdecimate=hi=64*10:lo=64*5:frac=0.1"]
+        # Standard input processing (No -skip_frame)
+        ffmpeg_input_args = ["-i", "pipe:0"]
         
-        else:
-             # SD MODE (360p / 480p)
-             # Use Scene Detection. It is accurate and avoids repetitions.
-             # Since resolution is low, CPU handles it easily.
-             print(f"🎨 SD Mode ({target_height}p): High-Accuracy Scene Detection...")
-             
-             ffmpeg_input_args = ["-i", "pipe:0"]
-             # select=gt(scene,0.4): The classic, accurate filter
-             ffmpeg_filter_args = ["-vf", "select=gt(scene\\,0.4)", "-vsync", "vfr"]
+        # The Filter:
+        # select=gt(scene,0.4): Select frame if scene difference score > 40%
+        # -vsync vfr: Variable Frame Rate (drops the frames we didn't select)
+        ffmpeg_filter_args = ["-vf", "select=gt(scene\\,0.4)", "-vsync", "vfr"]
 
         ffmpeg_cmd = [
             "ffmpeg", 
@@ -104,12 +89,11 @@ while True:
         if p1.returncode != 0:
              raise Exception(f"yt-dlp failed (code {p1.returncode})")
 
-        # Upload
+        # 3. UPLOAD
         r.set(f"job:{job_id}", json.dumps({"status": "UPLOADING_IMAGES"}))
         jpg_files = sorted(glob.glob("*.jpg"))
         
-        # 3. DEBUG LOG
-        print(f"📸 Extracted {len(jpg_files)} frames. Uploading...")
+        print(f"📸 Extracted {len(jpg_files)} frames via Scene Detection. Uploading...")
         
         upload_tasks = [(f, job_id, i) for i, f in enumerate(jpg_files)]
 
@@ -117,7 +101,7 @@ while True:
         with ThreadPoolExecutor(max_workers=10) as executor:
             image_urls = list(executor.map(upload_single_frame, upload_tasks))
 
-        # Zip
+        # 4. ZIP
         r.set(f"job:{job_id}", json.dumps({"status": "ZIPPING"}))
         zip_path = shutil.make_archive(os.path.join(FRAMES_DIR, job_id), 'zip', job_folder)
         blob_zip = bucket.blob(f"zips/{job_id}.zip")
