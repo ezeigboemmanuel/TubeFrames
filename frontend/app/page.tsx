@@ -129,7 +129,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background px-4">
       <header className="py-6 border-b border-border flex items-center justify-center">
         <div className="container">
           <div className="flex items-center justify-between">
