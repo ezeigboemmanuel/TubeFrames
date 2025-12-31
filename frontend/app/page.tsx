@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
-import { AuthButton } from "@/components/AuthButton";
+// Auth removed — open app for everyone
 import { URLInput } from "@/components/URLInput";
 import { FrameGrid } from "@/components/FrameGrid";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -13,10 +12,8 @@ import { Footer } from "@/components/Footer";
 import Link from "next/link";
 
 export default function Home() {
-  const { data: session } = useSession();
-  const isPro = !!session?.user?.isPro;
-
-  console.log("Session: ", session);
+  // App is open to everyone — enable all features by default
+  const isPro = true;
 
   const [isLoading, setIsLoading] = useState(false);
   const [frames, setFrames] = useState<
@@ -118,15 +115,6 @@ export default function Home() {
   };
 
   const handleDownloadZip = () => {
-    if (!isPro) {
-      toast({
-        variant: "destructive",
-        title: "Pro Feature",
-        description: "Upgrade to download all frames as a ZIP.",
-      });
-      return;
-    }
-
     if (zipUrl) {
       window.open(zipUrl, "_blank");
       toast({
@@ -137,10 +125,7 @@ export default function Home() {
   };
 
   const handleUpgrade = () => {
-    toast({
-      title: "Upgrade to Pro",
-      description: "Get higher quality extractions and ZIP downloads.",
-    });
+    // No upgrade required — feature removed.
   };
 
   return (
@@ -151,7 +136,7 @@ export default function Home() {
             <span className="font-mono font-bold text-lg text-foreground">
               TubeFrames
             </span>
-            <nav className="hidden sm:flex items-center gap-6">
+            {/* <nav className="hidden sm:flex items-center gap-6">
               <Link
                 href="/"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors font-mono"
@@ -159,7 +144,7 @@ export default function Home() {
                 Support?
               </Link>
               <AuthButton />
-            </nav>
+            </nav> */}
           </div>
         </div>
       </header>
@@ -176,11 +161,7 @@ export default function Home() {
             </p>
           </div>
 
-          <URLInput
-            onExtract={handleExtract}
-            isLoading={isLoading}
-            isPro={isPro}
-          />
+          <URLInput onExtract={handleExtract} isLoading={isLoading} />
         </div>
       </section>
 
@@ -189,10 +170,8 @@ export default function Home() {
           <div className="container">
             <FrameGrid
               frames={frames}
-              isPro={isPro}
               freeLimit={12}
               onDownloadFrame={handleDownloadFrame}
-              onUpgrade={handleUpgrade}
               onDownloadZip={handleDownloadZip}
             />
           </div>

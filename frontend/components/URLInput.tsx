@@ -15,10 +15,9 @@ import {
 interface URLInputProps {
   onExtract: (url: string, quality: string) => void;
   isLoading?: boolean;
-  isPro?: boolean;
 }
 
-export const URLInput = ({ onExtract, isLoading, isPro = false }: URLInputProps) => {
+export const URLInput = ({ onExtract, isLoading }: URLInputProps) => {
   const [url, setUrl] = useState("");
   const [quality, setQuality] = useState("480");
 
@@ -53,16 +52,9 @@ export const URLInput = ({ onExtract, isLoading, isPro = false }: URLInputProps)
                 <SelectItem value="360">360p (Fastest)</SelectItem>
                 <SelectItem value="480">480p (Standard)</SelectItem>
 
-                {/* LOCKED OPTIONS */}
-                <SelectItem value="720" disabled={!isPro}>
-                  {isPro ? "720p (HD)" : "🔒 720p (Sign In)"}
-                </SelectItem>
-                <SelectItem value="1080" disabled={!isPro}>
-                  {isPro ? "1080p (Full HD)" : "🔒 1080p (Sign In)"}
-                </SelectItem>
-                <SelectItem value="2160" disabled={!isPro}>
-                  {isPro ? "4K (Ultra HD)" : "🔒 4K (Sign In)"}
-                </SelectItem>
+                <SelectItem value="720">720p (HD)</SelectItem>
+                <SelectItem value="1080">1080p (Full HD)</SelectItem>
+                <SelectItem value="2160">4K (Ultra HD)</SelectItem>
               </SelectContent>
             </Select>
           </div>
