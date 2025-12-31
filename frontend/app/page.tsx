@@ -136,15 +136,7 @@ export default function Home() {
             <span className="font-mono font-bold text-lg text-foreground">
               TubeFrames
             </span>
-            {/* <nav className="hidden sm:flex items-center gap-6">
-              <Link
-                href="/"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors font-mono"
-              >
-                Support?
-              </Link>
-              <AuthButton />
-            </nav> */}
+            {/* nav removed (auth not required) */}
           </div>
         </div>
       </header>

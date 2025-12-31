@@ -1,1 +1,2 @@
-export { auth as proxy } from "@/auth"
+// Proxy for auth removed; stub to avoid import errors.
+export const proxy = null;
