@@ -35,7 +35,7 @@ bucket = storage_client.bucket(BUCKET_NAME)
 
 os.makedirs(FRAMES_DIR, exist_ok=True)
 
-logging.info('🚀 Worker Ready: Smart Scene Detection (Cooldown + De-Dup).')
+logging.info('🚀 Worker Ready: Smart Scene Detection (NaN Fix + 1.5s Cooldown).')
 
 def upload_single_frame(args):
     file_path, job_id, index = args
@@ -52,7 +52,6 @@ def run_worker_loop():
         job_id = job['jobId']
         url = job['url']
         target_height = int(job.get('quality', 480))
-        # Default to MAX_FRAMES if 'limit' is not provided in job
         requested_limit = int(job.get('limit', MAX_FRAMES))
 
         logging.info(f"Job {job_id}: Downloading at {target_height}p (Request Limit: {requested_limit})...")
@@ -64,7 +63,7 @@ def run_worker_loop():
         r.expire(f"job:{job_id}", 3600)
 
         try:
-            # 1. DOWNLOAD STREAM (Optimized for H.264)
+            # 1. DOWNLOAD STREAM
             v_limit = f"[height<={target_height}]"
             format_selector = f"bestvideo{v_limit}[vcodec^=avc]+bestaudio/best{v_limit}/best"
 
@@ -77,15 +76,13 @@ def run_worker_loop():
                 "-f", format_selector
             ]
 
-            # 2. SMART SCENE DETECTION
-            # - mpdecimate: Drops frames that are exact duplicates (saves CPU)
-            # - select='gt(scene,0.5)': Needs 50% pixel change (Stricter than 0.4)
-            # - gt(t-prev_selected_t,1.5): Enforces MINIMUM 1.5 seconds between screenshots
-            logging.info("🎨 Analyzing: Strict Threshold (0.5) + 1.5s Cooldown...")
+            # 2. FIXED SCENE DETECTION
+            # Logic: If (Scene Change > 40%) AND ( (It is the first frame) OR (Last screenshot was > 1.5s ago) )
+            logging.info("🎨 Analyzing: Threshold (0.4) + 1.5s Cooldown (NaN Check Added)...")
 
             ffmpeg_filter_args = [
                 "-vf", 
-                "mpdecimate,select='gt(scene,0.5)*gt(t-prev_selected_t,1.5)'", 
+                "select='gt(scene,0.4)*(isnan(prev_selected_t)+gt(t-prev_selected_t,1.5))'", 
                 "-vsync", "vfr"
             ]
 
@@ -116,11 +113,9 @@ def run_worker_loop():
             jpg_files = sorted(glob.glob(os.path.join(job_folder, "*.jpg")))
 
             total_extracted = len(jpg_files)
-            
-            # This handles your "157 vs 50" confusion
             upload_limit = min(requested_limit, MAX_FRAMES, total_extracted)
             
-            logging.info(f"📸 Extracted {total_extracted} frames. Uploading first {upload_limit} (Limit applied)...")
+            logging.info(f"📸 Extracted {total_extracted} frames. Uploading first {upload_limit}...")
 
             upload_tasks = [(f, job_id, i) for i, f in enumerate(jpg_files[:upload_limit])]
 
@@ -128,14 +123,12 @@ def run_worker_loop():
             with ThreadPoolExecutor(max_workers=10) as executor:
                 image_urls = list(executor.map(upload_single_frame, upload_tasks))
 
-            # 4. ZIP (Zips ONLY the frames we are uploading to match)
+            # 4. ZIP
             r.set(f"job:{job_id}", json.dumps({"status": "ZIPPING"}))
             
-            # Create a temporary folder for the zip content to ensure zip matches UI
             zip_content_folder = os.path.join(FRAMES_DIR, f"{job_id}_zip_content")
             os.makedirs(zip_content_folder, exist_ok=True)
             
-            # Copy only the selected files to zip folder
             for f_path in jpg_files[:upload_limit]:
                  shutil.copy(f_path, zip_content_folder)
 
@@ -145,7 +138,6 @@ def run_worker_loop():
             blob_zip.upload_from_filename(zip_path)
             zip_link = blob_zip.generate_signed_url(version="v4", expiration=timedelta(hours=SIGNED_URL_EXP_HOURS), method="GET")
 
-            # Cleanup temp zip folder
             shutil.rmtree(zip_content_folder, ignore_errors=True)
 
             result_data = {
@@ -164,7 +156,6 @@ def run_worker_loop():
             logging.exception(f"Error processing job {job_id}: {e}")
             r.set(f"job:{job_id}", json.dumps({"status": "ERROR", "error": str(e)}))
         finally:
-            # Cleanup
             try:
                 shutil.rmtree(job_folder, ignore_errors=True)
             except Exception:
