@@ -71,7 +71,7 @@ export const PricingTeaser = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
              {/* GitHub / Repo Link */}
-            <Link href="https://github.com/your-username/repo-name" target="_blank">
+            <Link href="https://github.com/ezeigboemmanuel/TubeFrames.git" target="_blank">
               <Button variant="default" size="lg" className="font-mono w-full sm:w-auto">
                 <Code className="mr-2 h-4 w-4" />
                 Steal the Code
@@ -79,7 +79,7 @@ export const PricingTeaser = () => {
             </Link>
             
             {/* Tool Link */}
-            <Link href="/dashboard">
+            <Link href="/">
               <Button variant="outline" size="lg" className="font-mono w-full sm:w-auto">
                 Start Using It
                 <ArrowRight className="ml-2 h-4 w-4" />

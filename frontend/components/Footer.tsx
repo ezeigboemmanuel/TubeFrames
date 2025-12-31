@@ -20,7 +20,7 @@ export const Footer = () => {
           {/* Navigation - Simplified for FOSS */}
           <nav className="flex flex-wrap items-center justify-center gap-6">
             <Link
-              href="https://github.com/your-username/repo"
+              href="https://github.com/ezeigboemmanuel/TubeFrames.git"
               target="_blank"
               className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors font-mono font-medium"
             >
@@ -29,7 +29,7 @@ export const Footer = () => {
             </Link>
             
             <Link
-              href="https://github.com/your-username/repo/issues"
+              href="https://github.com/ezeigboemmanuel/TubeFrames/issues"
               target="_blank"
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-red-400 transition-colors"
             >
