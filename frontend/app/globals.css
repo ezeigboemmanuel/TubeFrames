@@ -1,0 +1,193 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* 1. Standard Mappings */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  
+  /* Retained charts from your main file to prevent errors */
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  /* 2. Custom Token Mappings (Added so you can use them in v4) */
+  --color-frame-bg: var(--frame-bg);
+  --color-frame-border: var(--frame-border);
+  --color-frame-locked: var(--frame-locked);
+  --color-timestamp-bg: var(--timestamp-bg);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  /* 3. Animation Mappings */
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-frame-load: frame-load 0.3s ease-out forwards;
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+    50% { box-shadow: 0 0 20px 4px hsl(var(--primary) / 0.3); }
+  }
+
+  @keyframes frame-load {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+}
+
+/* COLOR DEFINITIONS 
+   We wrap the raw numbers from your source (e.g. 220 20% 6%) 
+   in hsl() so they work as standard CSS variables.
+*/
+
+:root {
+  --radius: 0.5rem;
+
+  --background: hsl(220 20% 6%);
+  --foreground: hsl(210 20% 92%);
+
+  --card: hsl(220 18% 10%);
+  --card-foreground: hsl(210 20% 92%);
+
+  --popover: hsl(220 18% 10%);
+  --popover-foreground: hsl(210 20% 92%);
+
+  --primary: hsl(175 70% 45%);
+  --primary-foreground: hsl(220 20% 6%);
+
+  --secondary: hsl(220 15% 16%);
+  --secondary-foreground: hsl(210 20% 85%);
+
+  --muted: hsl(220 15% 14%);
+  --muted-foreground: hsl(215 15% 55%);
+
+  --accent: hsl(175 70% 45%);
+  --accent-foreground: hsl(220 20% 6%);
+
+  --destructive: hsl(0 62% 50%);
+  --destructive-foreground: hsl(210 40% 98%);
+
+  --border: hsl(220 15% 18%);
+  --input: hsl(220 15% 14%);
+  --ring: hsl(175 70% 45%);
+
+  /* Custom Tokens */
+  --frame-bg: hsl(220 18% 12%);
+  --frame-border: hsl(220 15% 22%);
+  --frame-locked: hsl(220 15% 8%);
+  --timestamp-bg: hsl(220 20% 6% / 0.85);
+  --success: hsl(150 60% 45%);
+  --warning: hsl(45 90% 55%);
+
+  /* Sidebar */
+  --sidebar: hsl(220 18% 8%);
+  --sidebar-foreground: hsl(210 20% 92%);
+  --sidebar-primary: hsl(175 70% 45%);
+  --sidebar-primary-foreground: hsl(220 20% 6%);
+  --sidebar-accent: hsl(220 15% 16%);
+  --sidebar-accent-foreground: hsl(210 20% 92%);
+  --sidebar-border: hsl(220 15% 18%);
+  --sidebar-ring: hsl(175 70% 45%);
+
+  /* Charts (Preserved from v4 file as placeholders) */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+}
+
+.dark {
+  /* Your source file uses the exact same colors for Dark mode.
+     We repeat them here to ensure variables resolve correctly.
+  */
+  --background: hsl(220 20% 6%);
+  --foreground: hsl(210 20% 92%);
+  --card: hsl(220 18% 10%);
+  --card-foreground: hsl(210 20% 92%);
+  --popover: hsl(220 18% 10%);
+  --popover-foreground: hsl(210 20% 92%);
+  --primary: hsl(175 70% 45%);
+  --primary-foreground: hsl(220 20% 6%);
+  --secondary: hsl(220 15% 16%);
+  --secondary-foreground: hsl(210 20% 85%);
+  --muted: hsl(220 15% 14%);
+  --muted-foreground: hsl(215 15% 55%);
+  --accent: hsl(175 70% 45%);
+  --accent-foreground: hsl(220 20% 6%);
+  --destructive: hsl(0 62% 50%);
+  --destructive-foreground: hsl(210 40% 98%);
+  --border: hsl(220 15% 18%);
+  --input: hsl(220 15% 14%);
+  --ring: hsl(175 70% 45%);
+  
+  --sidebar: hsl(220 18% 8%);
+  --sidebar-foreground: hsl(210 20% 92%);
+  --sidebar-primary: hsl(175 70% 45%);
+  --sidebar-primary-foreground: hsl(220 20% 6%);
+  --sidebar-accent: hsl(220 15% 16%);
+  --sidebar-accent-foreground: hsl(210 20% 92%);
+  --sidebar-border: hsl(220 15% 18%);
+  --sidebar-ring: hsl(175 70% 45%);
+  
+  /* Charts (Preserved) */
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

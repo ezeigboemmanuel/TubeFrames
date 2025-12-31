@@ -1,0 +1,4 @@
+.env*
+.env.local
+gcp-key.json
+docker-compose.yml

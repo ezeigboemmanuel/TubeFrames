@@ -1,0 +1,6 @@
+redis
+yt-dlp
+ffmpeg-python
+google-cloud-storage
+requests
+google-auth
