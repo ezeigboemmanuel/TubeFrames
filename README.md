@@ -1,6 +1,6 @@
 # TubeFrames (https://tubeframes.vercel.app)
 
-A lightweight server + worker SaaS for extracting scene-detected frames from YouTube (or other) videos, uploading frames and zips to Google Cloud Storage, and serving results via a Next.js frontend.
+A lightweight server + worker app for extracting scene-detected frames from YouTube (or other) videos, uploading frames and zips to Google Cloud Storage, and serving results via a Next.js frontend.
 
 **Quick Summary**
 - **Frontend:** Next.js app (in `frontend/`) with NextAuth for Google sign-in and Prisma for Postgres user storage.
