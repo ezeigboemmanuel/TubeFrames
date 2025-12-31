@@ -1,4 +1,4 @@
-**YT Video SaaS**
+# TubeFrames (https://tubeframes.vercel.app)
 
 A lightweight server + worker SaaS for extracting scene-detected frames from YouTube (or other) videos, uploading frames and zips to Google Cloud Storage, and serving results via a Next.js frontend.
 
